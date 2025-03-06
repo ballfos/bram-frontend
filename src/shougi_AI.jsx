@@ -1,209 +1,44 @@
 import axios from "axios";
 import React, { useState, useEffect, useMemo } from "react";
 import "./Shougi_AI.css";
+import PieceImage from "./components/PieceImage";
+
 const pieceSymbols = {
-	p: (
-		<img
-			src="/hitomoji/black_pawn.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
-	l: (
-		<img
-			src="/hitomoji/black_lance.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
-	n: (
-		<img
-			src="/hitomoji/black_knight.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
-	s: (
-		<img
-			src="/hitomoji/black_silver.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
-	g: (
-		<img
-			src="/hitomoji/black_gold.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
-	k: (
-		<img
-			src="/hitomoji/black_king.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
-	r: (
-		<img
-			src="/hitomoji/black_rook.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
-	b: (
-		<img
-			src="/hitomoji/black_bishop.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
-	"+p": (
-		<img
-			src="/hitomoji/black_prom_pawn.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
-	"+l": (
-		<img
-			src="/hitomoji/black_prom_lance.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
-	"+n": (
-		<img
-			src="/hitomoji/black_prom_knight.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
-	"+s": (
-		<img
-			src="/hitomoji/black_prom_silver.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
-	"+r": (
-		<img
-			src="/hitomoji/black_dragon.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
-	"+b": (
-		<img
-			src="/hitomoji/black_horse.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
-	P: (
-		<img
-			src="/hitomoji/black_pawn.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
-	L: (
-		<img
-			src="/hitomoji/black_lance.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
-	N: (
-		<img
-			src="/hitomoji/black_knight.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
-	S: (
-		<img
-			src="/hitomoji/black_silver.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
-	G: (
-		<img
-			src="/hitomoji/black_gold.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
-	K: (
-		<img
-			src="/hitomoji/black_king2.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
-	R: (
-		<img
-			src="/hitomoji/black_rook.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
-	B: (
-		<img
-			src="/hitomoji/black_bishop.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
-	"+P": (
-		<img
-			src="/hitomoji/black_prom_pawn.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
-	"+L": (
-		<img
-			src="/hitomoji/black_prom_lance.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
-	"+N": (
-		<img
-			src="/hitomoji/black_prom_knight.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
-	"+S": (
-		<img
-			src="/hitomoji/black_prom_silver.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
-	"+R": (
-		<img
-			src="/hitomoji/black_dragon.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
-	"+B": (
-		<img
-			src="/hitomoji/black_horse.png"
-			alt="Black Pawn"
-			className="piece-image"
-		/>
-	),
+	p: <PieceImage src="/pieces/p.png" />,
+	l: <PieceImage src="/pieces/l.png" />,
+	n: <PieceImage src="/pieces/n.png" />,
+	s: <PieceImage src="/pieces/s.png" />,
+	g: <PieceImage src="/pieces/g.png" />,
+	k: <PieceImage src="/pieces/k.png" />,
+	r: <PieceImage src="/pieces/r.png" />,
+	b: <PieceImage src="/pieces/b.png" />,
+	"+p": <PieceImage src="/pieces/+p.png" />,
+	"+l": <PieceImage src="/pieces/+l.png" />,
+	"+n": <PieceImage src="/pieces/+n.png" />,
+	"+s": <PieceImage src="/pieces/+s.png" />,
+	"+r": <PieceImage src="/pieces/+r.png" />,
+	"+b": <PieceImage src="/pieces/+b.png" />,
+	P: <PieceImage src="/pieces/p.png" />,
+	L: <PieceImage src="/pieces/l.png" />,
+	N: <PieceImage src="/pieces/n.png" />,
+	S: <PieceImage src="/pieces/s.png" />,
+	G: <PieceImage src="/pieces/g.png" />,
+	K: <PieceImage src="/pieces/k.png" />,
+	R: <PieceImage src="/pieces/r.png" />,
+	B: <PieceImage src="/pieces/b.png" />,
+	"+P": <PieceImage src="/pieces/+p.png" />,
+	"+L": <PieceImage src="/pieces/+l.png" />,
+	"+N": <PieceImage src="/pieces/+n.png" />,
+	"+S": <PieceImage src="/pieces/+s.png" />,
+	"+R": <PieceImage src="/pieces/+r.png" />,
+	"+B": <PieceImage src="/pieces/+b.png" />,
 };
 
 const sfenToNewBoard = (sfen) => {
 	if (sfen === "None") {
-		alert(`勝ち！！！`);
+		alert("勝ち！！！");
 		setIsGameOver(true);
+		// biome-ignore lint/correctness/noInvalidUseBeforeDeclaration: <explanation>
 		return { board, hand };
 	}
 
@@ -226,7 +61,7 @@ const sfenToNewBoard = (sfen) => {
 				expandedRow.push(...Array(Number(char)).fill(null));
 			} else {
 				// 通常の駒 or 成駒
-				expandedRow.push(isPromoted ? "+" + char : char);
+				expandedRow.push(isPromoted ? `+${char}` : char);
 				isPromoted = false; // 成駒フラグをリセット
 			}
 		}
@@ -311,7 +146,7 @@ const sfenString =
 
 const ShogiBoard = () => {
 	const [board, setBoard] = useState(parseSfen(initialSfen));
-	//const [currentSfen, setCurrentSfen] = useState(initialSfen); // SFEN を保持
+	// const [currentSfen, setCurrentSfen] = useState(initialSfen); // SFEN を保持
 	const [selectedPiece, setSelectedPiece] = useState(null);
 	const [turn, setTurn] = useState("w");
 	const [highlightedCells, setHighlightedCells] = useState([]);
@@ -383,7 +218,7 @@ const ShogiBoard = () => {
 
 	const handleClick = (row, col) => {
 		if (!currentSfen.includes("K")) {
-			alert(`負け！！！`);
+			alert("負け！！！");
 			setIsGameOver(true);
 		}
 		if (isGameOver) return;
@@ -694,7 +529,8 @@ const ShogiBoard = () => {
 		};
 
 		let num = 0;
-		(directions[piece] || []).forEach(([dx, dy]) => {
+		// (directions[piece] || []).forEach(([dx, dy]) => {
+		for (const [dx, dy] of directions[piece] || []) {
 			num++;
 			let x = row + dx;
 			let y = col + dy;
@@ -723,7 +559,7 @@ const ShogiBoard = () => {
 					break;
 				}
 			}
-		});
+		}
 
 		return cells;
 	};
@@ -736,8 +572,12 @@ const ShogiBoard = () => {
 				<div className="hand-wrapper-bram">
 					{hand.b.map((piece, index) => (
 						<div
-							key={`b-${index}`}
+							key={`b-${
+								// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+								index
+							}`}
 							onClick={() => handleHandClick(piece, index)}
+							onKeyDown={() => handleHandClick(piece, index)}
 							className={`hand-piece-bram ${
 								turn === "b" ? "enabled" : "disabled"
 							} ${turn === "b" && selectedHandPiece?.index === index ? "selected" : ""}`}
@@ -763,8 +603,12 @@ const ShogiBoard = () => {
 
 						return (
 							<div
-								key={`${rowIndex}-${colIndex}`}
+								key={`${rowIndex}-${
+									// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+									colIndex
+								}`}
 								onClick={() => sepa_turn(rowIndex, colIndex)}
+								onKeyDown={() => sepa_turn(rowIndex, colIndex)}
 								className={`cell ${isHighlighted ? "highlighted" : ""} ${
 									isSelected ? "selected" : ""
 								} ${isRotated ? "rotated" : ""}`}
@@ -782,8 +626,12 @@ const ShogiBoard = () => {
 				<div className="hand-wrapper">
 					{hand.w.map((piece, index) => (
 						<div
-							key={`w-${index}`}
+							key={`w-${
+								// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+								index
+							}`}
 							onClick={() => handleHandClick(piece, index)}
+							onKeyDown={() => handleHandClick(piece, index)}
 							className={`hand-piece ${
 								turn === "w" ? "enabled" : "disabled"
 							} ${turn === "w" && selectedHandPiece?.index === index ? "selected" : ""}`}
