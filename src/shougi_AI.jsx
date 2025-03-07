@@ -3,6 +3,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import "./Shougi_AI.css";
 import HandSummary from "./components/HandSummary";
 import PieceImage from "./components/PieceImage";
+import ShogiBoard from "./components/ShogiBoard";
 import { removeFirstMatch } from "./utils";
 
 const sfenToNewBoard = (sfen) => {
@@ -115,7 +116,7 @@ const initialSfen =
 const sfenString =
 	"lnsgkg1nl/1r5s1/ppp1p2pp/3p5/5PP2/2P6/PP1PP2PP/7R1/LNSGKGSNL b bB2P w - 3";
 
-const ShogiBoard = () => {
+const ShogiContent = () => {
 	const [board, setBoard] = useState(parseSfen(initialSfen));
 	// const [currentSfen, setCurrentSfen] = useState(initialSfen); // SFEN を保持
 	const [selected, setSelected] = useState({
@@ -275,7 +276,7 @@ const ShogiBoard = () => {
 				} else {
 					setSelected({ type: null, piece: null, row: null, col: null });
 					setHighlightedCells([]);
-					setCurrentSfen(generateSfen(board, hand, turn, turnCount));
+					// setCurrentSfen(generateSfen(board, hand, turn, turnCount));
 				}
 				break;
 			}
@@ -305,8 +306,9 @@ const ShogiBoard = () => {
 			default: {
 				if (isOwnPiece(board[row][col], turn)) {
 					setSelected({ type: "board", piece, row, col });
+					console.log(getMovableCells(row, col, piece));
 					setHighlightedCells(getMovableCells(row, col, piece));
-					setCurrentSfen(generateSfen(board, hand, turn, turnCount));
+					// setCurrentSfen(generateSfen(board, hand, turn, turnCount));
 				}
 				break;
 			}
@@ -514,7 +516,6 @@ const ShogiBoard = () => {
 		};
 
 		let num = 0;
-		// (directions[piece] || []).forEach(([dx, dy]) => {
 		for (const [dx, dy] of directions[piece] || []) {
 			num++;
 			let x = row + dx;
@@ -562,38 +563,12 @@ const ShogiBoard = () => {
 			</div>
 
 			{/* 将棋盤 */}
-			<div className="board">
-				{board.map((row, rowIndex) =>
-					row.map((piece, colIndex) => {
-						const isHighlighted = highlightedCells.some(
-							([r, c]) => r === rowIndex && c === colIndex,
-						);
-						const isSelected =
-							selected.row === rowIndex && selected.col === colIndex;
-						const isRotated = piece && piece.toLowerCase() === piece;
-
-						return (
-							<div
-								key={`${rowIndex}-${
-									// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-									colIndex
-								}`}
-								onClick={() => sepa_turn(rowIndex, colIndex)}
-								onKeyDown={() => sepa_turn(rowIndex, colIndex)}
-								className={`cell ${isHighlighted ? "highlighted" : ""} ${
-									isSelected ? "selected" : ""
-								}`}
-							>
-								{piece ? (
-									<PieceImage piece={piece.toLowerCase()} reverse={isRotated} />
-								) : (
-									""
-								)}
-							</div>
-						);
-					}),
-				)}
-			</div>
+			<ShogiBoard
+				board={board}
+				selected={selected}
+				onSquareClick={sepa_turn}
+				movableCells={highlightedCells}
+			/>
 
 			{/* 後手の持ち駒 */}
 			<div className="container">
@@ -608,4 +583,4 @@ const ShogiBoard = () => {
 	);
 };
 
-export default ShogiBoard;
+export default ShogiContent;
