@@ -1,38 +1,10 @@
 import axios from "axios";
 import React, { useState, useEffect, useMemo } from "react";
 import "./Shougi_AI.css";
+import HandSummary from "./components/HandSummary";
 import PieceImage from "./components/PieceImage";
-
-const pieceSymbols = {
-	p: <PieceImage src="/pieces/p.png" />,
-	l: <PieceImage src="/pieces/l.png" />,
-	n: <PieceImage src="/pieces/n.png" />,
-	s: <PieceImage src="/pieces/s.png" />,
-	g: <PieceImage src="/pieces/g.png" />,
-	k: <PieceImage src="/pieces/k.png" />,
-	r: <PieceImage src="/pieces/r.png" />,
-	b: <PieceImage src="/pieces/b.png" />,
-	"+p": <PieceImage src="/pieces/+p.png" />,
-	"+l": <PieceImage src="/pieces/+l.png" />,
-	"+n": <PieceImage src="/pieces/+n.png" />,
-	"+s": <PieceImage src="/pieces/+s.png" />,
-	"+r": <PieceImage src="/pieces/+r.png" />,
-	"+b": <PieceImage src="/pieces/+b.png" />,
-	P: <PieceImage src="/pieces/p.png" />,
-	L: <PieceImage src="/pieces/l.png" />,
-	N: <PieceImage src="/pieces/n.png" />,
-	S: <PieceImage src="/pieces/s.png" />,
-	G: <PieceImage src="/pieces/g.png" />,
-	K: <PieceImage src="/pieces/k.png" />,
-	R: <PieceImage src="/pieces/r.png" />,
-	B: <PieceImage src="/pieces/b.png" />,
-	"+P": <PieceImage src="/pieces/+p.png" />,
-	"+L": <PieceImage src="/pieces/+l.png" />,
-	"+N": <PieceImage src="/pieces/+n.png" />,
-	"+S": <PieceImage src="/pieces/+s.png" />,
-	"+R": <PieceImage src="/pieces/+r.png" />,
-	"+B": <PieceImage src="/pieces/+b.png" />,
-};
+import ShogiBoard from "./components/ShogiBoard";
+import { removeFirstMatch } from "./utils";
 
 const sfenToNewBoard = (sfen) => {
 	if (sfen === "None") {
@@ -144,14 +116,18 @@ const initialSfen =
 const sfenString =
 	"lnsgkg1nl/1r5s1/ppp1p2pp/3p5/5PP2/2P6/PP1PP2PP/7R1/LNSGKGSNL b bB2P w - 3";
 
-const ShogiBoard = () => {
+const ShogiContent = () => {
 	const [board, setBoard] = useState(parseSfen(initialSfen));
 	// const [currentSfen, setCurrentSfen] = useState(initialSfen); // SFEN を保持
-	const [selectedPiece, setSelectedPiece] = useState(null);
+	const [selected, setSelected] = useState({
+		type: null, // "board" | "hand" | null
+		piece: null, // string | null
+		row: null, // 0-8 | null
+		col: null, // 0-8 | null
+	});
 	const [turn, setTurn] = useState("w");
 	const [highlightedCells, setHighlightedCells] = useState([]);
 	const [hand, setHand] = useState({ b: [], w: [] }); // 持ち駒を管理
-	const [selectedHandPiece, setSelectedHandPiece] = useState(null); // 持ち駒を選択
 	const [getMessage, setGetMessage] = useState("");
 	const [postMessage, setPostMessage] = useState(""); // サーバから受け取る用
 	const [input, setInput] = useState("");
@@ -178,7 +154,7 @@ const ShogiBoard = () => {
 	const sendData = async () => {
 		//SFEN送信
 		try {
-			const response = await axios.post("http://127.0.0.1:5000/api/data", {
+			const response = await axios.post("http://127.0.0.1:8000/next", {
 				currentSfen,
 			});
 			console.log("Response message:", response.data.response_message);
@@ -222,118 +198,129 @@ const ShogiBoard = () => {
 			setIsGameOver(true);
 		}
 		if (isGameOver) return;
-		if (selectedHandPiece !== null) {
-			if (!board[row][col]) {
-				const newBoard = board.map((r) => r.slice());
-				newBoard[row][col] = selectedHandPiece.piece;
-				setBoard(newBoard);
-
-				setHand((prev) => {
-					const updatedHand = { ...prev };
-					updatedHand[turn] = prev[turn].filter(
-						(_, index) => index !== selectedHandPiece.index,
-					);
-
-					return updatedHand;
-				});
-
-				setSelectedHandPiece(null);
-				setTurn(turn === "b" ? "w" : "b");
-				setTurnCount((prev) => prev + 1);
-			} else {
-				setSelectedHandPiece(null);
-			}
-			return;
-		}
 
 		const piece = board[row][col];
+		switch (selected.type) {
+			// 現時点でボード上の駒が選択されている場合
+			case "board": {
+				const { row: fromRow, col: fromCol } = selected;
+				const movable = highlightedCells.some(
+					([r, c]) => r === row && c === col,
+				);
 
-		if (selectedPiece) {
-			const [fromRow, fromCol] = selectedPiece;
-			const movable = highlightedCells.some(([r, c]) => r === row && c === col);
+				// 移動可能マスをクリックした場合
+				if (movable) {
+					const newBoard = board.map((r) => r.slice());
+					const movingPiece = newBoard[fromRow][fromCol];
+					const isEnemy = isEnemyPiece(piece, turn);
 
-			if (movable) {
-				const newBoard = board.map((r) => r.slice());
-				const movingPiece = newBoard[fromRow][fromCol];
-				const isEnemy = isEnemyPiece(piece, turn);
-
-				if (isEnemy) {
-					if (piece === "k" || piece === "K") {
-						// 王または玉が取られた場合、ゲーム終了
-						alert(`${turn === "b" ? "βらm" : "あなた"}の勝利です！`);
-						setIsGameOver(true);
-						return;
-					}
-					setHand((prev) => {
-						const updatedHand = { ...prev };
-						const originalPiece = piece.startsWith("+")
-							? piece.slice(1)
-							: piece; // 成駒を元の駒に戻す
-						if (turn === "b") {
-							updatedHand.b = [...prev.b, originalPiece.toLowerCase()];
-						} else if (turn === "w") {
-							updatedHand.w = [...prev.w, originalPiece.toUpperCase()];
+					if (isEnemy) {
+						if (piece === "k" || piece === "K") {
+							// 王または玉が取られた場合、ゲーム終了
+							alert(`${turn === "b" ? "βらm" : "あなた"}の勝利です！`);
+							setIsGameOver(true);
+							return;
 						}
-						setHand(updatedHand);
-						return updatedHand;
-					});
-				}
+						setHand((prev) => {
+							const updatedHand = { ...prev };
+							const originalPiece = piece.startsWith("+")
+								? piece.slice(1)
+								: piece; // 成駒を元の駒に戻す
+							if (turn === "b") {
+								updatedHand.b = [...prev.b, originalPiece.toLowerCase()];
+							} else if (turn === "w") {
+								updatedHand.w = [...prev.w, originalPiece.toUpperCase()];
+							}
+							setHand(updatedHand);
+							return updatedHand;
+						});
+					}
 
-				const isPromotable = [
-					"p",
-					"l",
-					"n",
-					"s",
-					"r",
-					"b",
-					"P",
-					"L",
-					"N",
-					"S",
-					"R",
-					"B",
-				].includes(movingPiece);
-				const enteredEnemyTerritory =
-					(turn === "w" && (fromRow <= 2 || row <= 2)) ||
-					(turn === "b" && (fromRow >= 6 || row >= 6));
+					const isPromotable = [
+						"p",
+						"l",
+						"n",
+						"s",
+						"r",
+						"b",
+						"P",
+						"L",
+						"N",
+						"S",
+						"R",
+						"B",
+					].includes(movingPiece);
+					const enteredEnemyTerritory =
+						(turn === "w" && (fromRow <= 2 || row <= 2)) ||
+						(turn === "b" && (fromRow >= 6 || row >= 6));
 
-				if (isPromotable && enteredEnemyTerritory) {
-					if (window.confirm("成りますか？")) {
-						newBoard[row][col] = promotePiece(movingPiece);
+					if (isPromotable && enteredEnemyTerritory) {
+						if (window.confirm("成りますか？")) {
+							newBoard[row][col] = promotePiece(movingPiece);
+						} else {
+							newBoard[row][col] = movingPiece;
+						}
 					} else {
 						newBoard[row][col] = movingPiece;
 					}
+
+					newBoard[fromRow][fromCol] = null;
+
+					setBoard(newBoard);
+					setSelected({ type: null, piece: null, row: null, col: null });
+					setHighlightedCells([]);
+					setTurn(turn === "b" ? "w" : "b");
+					setTurnCount((prev) => prev + 1);
+
+					//setCurrentSfen(generateSfen(newBoard, hand, turn, turnCount));  // SFEN を更新
 				} else {
-					newBoard[row][col] = movingPiece;
+					setSelected({ type: null, piece: null, row: null, col: null });
+					setHighlightedCells([]);
+					// setCurrentSfen(generateSfen(board, hand, turn, turnCount));
 				}
+				break;
+			}
 
-				newBoard[fromRow][fromCol] = null;
-
+			// 現時点で持ち駒が選択されている場合
+			case "hand": {
+				// 既に駒がある場合は何もしない
+				if (piece) {
+					setSelected({ type: null, piece: null, row: null, col: null });
+					break;
+				}
+				// 空いている場合は駒を配置する
+				const newBoard = board.map((r) => r.slice());
+				newBoard[row][col] = selected.piece;
 				setBoard(newBoard);
-				setSelectedPiece(null);
-				setHighlightedCells([]);
+				setHand((prev) => ({
+					...prev,
+					[turn]: removeFirstMatch(prev[turn], selected.piece),
+				}));
+				setSelected({ type: null, piece: null, row: null, col: null });
 				setTurn(turn === "b" ? "w" : "b");
 				setTurnCount((prev) => prev + 1);
-
-				//setCurrentSfen(generateSfen(newBoard, hand, turn, turnCount));  // SFEN を更新
-			} else {
-				setSelectedPiece(null);
-				setHighlightedCells([]);
-				setCurrentSfen(generateSfen(board, hand, turn, turnCount));
+				break;
 			}
-		} else if (isOwnPiece(piece, turn)) {
-			setSelectedPiece([row, col]);
-			setHighlightedCells(getMovableCells(row, col, piece));
-			setCurrentSfen(generateSfen(board, hand, turn, turnCount));
+			// 現時点で何も選択されていない場合
+
+			default: {
+				if (isOwnPiece(board[row][col], turn)) {
+					setSelected({ type: "board", piece, row, col });
+					console.log(getMovableCells(row, col, piece));
+					setHighlightedCells(getMovableCells(row, col, piece));
+					// setCurrentSfen(generateSfen(board, hand, turn, turnCount));
+				}
+				break;
+			}
 		}
 	};
 
-	const handleHandClick = (piece, index) => {
+	const handleHandClick = (piece) => {
 		if (
 			(turn === "b" && piece === piece.toLowerCase()) ||
 			(turn === "w" && piece === piece.toUpperCase())
 		) {
-			setSelectedHandPiece({ piece, index });
+			setSelected({ type: "hand", piece, row: null, col: null });
 		}
 	};
 
@@ -529,7 +516,6 @@ const ShogiBoard = () => {
 		};
 
 		let num = 0;
-		// (directions[piece] || []).forEach(([dx, dy]) => {
 		for (const [dx, dy] of directions[piece] || []) {
 			num++;
 			let x = row + dx;
@@ -568,81 +554,33 @@ const ShogiBoard = () => {
 		<div className="cite_style">
 			{/* 先手の持ち駒 */}
 			<div className="container-bram">
-				<p>　　　　　　　　　　　　　　　　αらm:</p>
-				<div className="hand-wrapper-bram">
-					{hand.b.map((piece, index) => (
-						<div
-							key={`b-${
-								// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-								index
-							}`}
-							onClick={() => handleHandClick(piece, index)}
-							onKeyDown={() => handleHandClick(piece, index)}
-							className={`hand-piece-bram ${
-								turn === "b" ? "enabled" : "disabled"
-							} ${turn === "b" && selectedHandPiece?.index === index ? "selected" : ""}`}
-						>
-							{pieceSymbols[piece]}
-						</div>
-					))}
-				</div>
+				{/* <p>　　　　　　　　　　　　　　　　αらm:</p> */}
+				<HandSummary
+					pieces={hand.b}
+					onPieceClick={handleHandClick}
+					selected={selected.type === "hand" ? selected.piece : null}
+				/>
 			</div>
 
 			{/* 将棋盤 */}
-			<div className="board">
-				{board.map((row, rowIndex) =>
-					row.map((piece, colIndex) => {
-						const isHighlighted = highlightedCells.some(
-							([r, c]) => r === rowIndex && c === colIndex,
-						);
-						const isSelected =
-							selectedPiece &&
-							selectedPiece[0] === rowIndex &&
-							selectedPiece[1] === colIndex;
-						const isRotated = piece && piece.toLowerCase() === piece;
-
-						return (
-							<div
-								key={`${rowIndex}-${
-									// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-									colIndex
-								}`}
-								onClick={() => sepa_turn(rowIndex, colIndex)}
-								onKeyDown={() => sepa_turn(rowIndex, colIndex)}
-								className={`cell ${isHighlighted ? "highlighted" : ""} ${
-									isSelected ? "selected" : ""
-								} ${isRotated ? "rotated" : ""}`}
-							>
-								{piece ? pieceSymbols[piece] : ""}
-							</div>
-						);
-					}),
-				)}
-			</div>
+			<ShogiBoard
+				board={board}
+				selected={selected}
+				onSquareClick={sepa_turn}
+				movableCells={highlightedCells}
+			/>
 
 			{/* 後手の持ち駒 */}
 			<div className="container">
-				<p>あなた:</p>
-				<div className="hand-wrapper">
-					{hand.w.map((piece, index) => (
-						<div
-							key={`w-${
-								// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-								index
-							}`}
-							onClick={() => handleHandClick(piece, index)}
-							onKeyDown={() => handleHandClick(piece, index)}
-							className={`hand-piece ${
-								turn === "w" ? "enabled" : "disabled"
-							} ${turn === "w" && selectedHandPiece?.index === index ? "selected" : ""}`}
-						>
-							{pieceSymbols[piece]}
-						</div>
-					))}
-				</div>
+				{/* <p>あなた:</p> */}
+				<HandSummary
+					pieces={hand.w}
+					onPieceClick={handleHandClick}
+					selected={selected.type === "hand" ? selected.piece : null}
+				/>
 			</div>
 		</div>
 	);
 };
 
-export default ShogiBoard;
+export default ShogiContent;
