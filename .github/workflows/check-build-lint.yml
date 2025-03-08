@@ -1,0 +1,34 @@
+name: Check Build and Lint
+
+on:
+    pull_request:
+        branches:
+            - main
+
+jobs:
+    check-lint:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            
+            - uses: actions/setup-node@v4
+              with:
+                    node-version: "20"
+            
+            - run: npm i
+            - run: npm run lint
+
+    check-build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            
+            - uses: actions/setup-node@v4
+              with:
+                    node-version: "20"
+            
+            - run: npm i
+            - run: npm run build
+
+
+
