@@ -1,6 +1,6 @@
 // App.js
 import React from "react";
-import ShogiBoard from "./shougi_AI.jsx";
+import ShogiContent from "./shougi_AI.jsx";
 
 const App = () => {
 	return (
@@ -14,7 +14,7 @@ const App = () => {
 			}}
 		>
 			<h1>将棋盤</h1>
-			<ShogiBoard />
+			<ShogiContent />
 		</div>
 	);
 };
