@@ -1,40 +1,42 @@
+import { Color } from "shogi.js";
 import styles from "./PieceImage.module.css";
 
-const pieceToSrc = {
-	p: "/pieces/p.png",
-	l: "/pieces/l.png",
-	n: "/pieces/n.png",
-	s: "/pieces/s.png",
-	g: "/pieces/g.png",
-	k: "/pieces/k.png",
-	r: "/pieces/r.png",
-	b: "/pieces/b.png",
-	"+p": "/pieces/+p.png",
-	"+l": "/pieces/+l.png",
-	"+n": "/pieces/+n.png",
-	"+s": "/pieces/+s.png",
-	"+r": "/pieces/+r.png",
-	"+b": "/pieces/+b.png",
+const kindToSrc = {
+	FU: "/pieces/p.png",
+	KY: "/pieces/l.png",
+	KE: "/pieces/n.png",
+	GI: "/pieces/s.png",
+	KI: "/pieces/g.png",
+	OU: "/pieces/k.png",
+	HI: "/pieces/r.png",
+	KA: "/pieces/b.png",
+	TO: "/pieces/+p.png",
+	NK: "/pieces/+l.png",
+	NY: "/pieces/+n.png",
+	NG: "/pieces/+s.png",
+	RY: "/pieces/+r.png",
+	UM: "/pieces/+b.png",
 };
 
 const PieceImage = ({
-	piece,
-	reverse = false,
+	kind,
+	color,
 	count = 1,
 	highlight = false,
-	onClick,
+	...props
 }) => {
 	return (
 		<div
 			className={`${styles["piece-container"]} ${highlight ? styles["piece-highlight"] : ""}`}
-			onClick={onClick}
-			onKeyDown={onClick}
+			{...props}
 		>
 			<img
 				className={styles["piece-image"]}
-				src={pieceToSrc[piece]}
-				alt={piece}
-				style={{ transform: reverse ? "rotate(180deg)" : "" }}
+				src={kindToSrc[kind]}
+				alt={`${color}-${kind}`}
+				style={{
+					transform: color === Color.White ? "rotate(180deg)" : "",
+				}}
 			/>
 			{count > 1 && <span className={styles["piece-number"]}>{count}</span>}
 		</div>
