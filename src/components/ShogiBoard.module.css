@@ -1,7 +1,9 @@
 .board {
 	display: grid;
+	grid-auto-flow: column;
 	grid-template-rows: repeat(9, 50px);
 	grid-template-columns: repeat(9, 50px);
+	direction: rtl;
 	gap: 0.5px;
 	justify-items: center;
 	align-items: center;
