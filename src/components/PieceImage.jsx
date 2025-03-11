@@ -32,7 +32,7 @@ const PieceImage = ({
 		>
 			<img
 				className={styles["piece-image"]}
-				src={kindToSrc[kind]}
+				src={`${import.meta.env.BASE_URL}${kindToSrc[kind]}`}
 				alt={`${color}-${kind}`}
 				style={{
 					transform: color === Color.White ? "rotate(180deg)" : "",
