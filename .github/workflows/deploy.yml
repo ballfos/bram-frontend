@@ -7,19 +7,19 @@ on:
       - pages_deploy
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       # 1. リポジトリのチェックアウト
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # 2. Node.js のセットアップ
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 16  # 使用する Node.js のバージョンを指定
+          node-version: 20  # 使用する Node.js のバージョンを指定
 
       # 3. 依存パッケージのインストール
       - name: Install dependencies
@@ -31,13 +31,12 @@ jobs:
 
       # 5. GitHub Pages にデプロイするためのアーティファクトをアップロード
       - name: Upload build to GitHub Pages
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: build
-          path: ./build
+          path: ./dist
 
   deploy:
-    needs: build-and-deploy
+    needs: build
     permissions:
       pages: write
       id-token: write
@@ -49,7 +48,4 @@ jobs:
       # 6. GitHub Pages にデプロイ
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
+        uses: actions/deploy-pages@v4
