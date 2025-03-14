@@ -1,5 +1,5 @@
 import React from "react";
-import "./header.css";
+import "./Header.css";
 import { MdContentCopy } from "react-icons/md";
 const Header = ({ onCopySfenClick }) => {
 	return (
