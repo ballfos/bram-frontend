@@ -1,6 +1,7 @@
-.hand-summary-container {
+.container {
 	display: flex;
 	flex-direction: row;
 	align-items: left;
 	width: 100%;
+	height: 100%;
 }
