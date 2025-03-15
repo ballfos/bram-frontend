@@ -1,16 +1,12 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Color, Piece, Shogi } from "shogi.js";
 import HandSummary from "../components/HandSummary";
 import Header from "../components/Header";
 import ShogiBoard from "../components/ShogiBoard";
-import { cloneShogi } from "../utils";
-
-const initialShogiState = () => {
-	const shogi = new Shogi();
-	shogi.initialize();
-	return shogi;
-};
+import useSfen from "../hooks/useSfen";
+import { shogiFromSfen } from "../utils";
+import styles from "./Game.module.css";
 
 const initialSelectedState = {
 	type: null, // "board" | "hand" | null
@@ -21,9 +17,11 @@ const initialSelectedState = {
 };
 
 const Game = () => {
-	const [shogi, setShogi] = useState(initialShogiState);
+	const [sfen, setSfen] = useSfen();
 	const [selected, setSelected] = useState(initialSelectedState);
 	const [isGameOver, setIsGameOver] = useState(false);
+	const shogi = useMemo(() => shogiFromSfen(sfen), [sfen]);
+
 	useEffect(() => {
 		if (shogi.turn === Color.White) {
 			axios
@@ -32,22 +30,13 @@ const Game = () => {
 				})
 				.then((response) => {
 					const nextSfen = response.data.message;
-					const shogi = new Shogi();
-					shogi.initializeFromSFENString(nextSfen);
-					setShogi(shogi);
+					setSfen(nextSfen);
 				})
 				.catch((error) => {
 					console.error("Error sending data:", error);
 				});
 		}
-	}, [shogi]);
-
-	const sepa_turn = async (x, y) => {
-		if (shogi.turn === Color.Black) {
-			handleBoardClick(x, y);
-		} else {
-		}
-	};
+	}, [shogi, setSfen]);
 
 	const handleBoardClick = (x, y) => {
 		const piece = shogi.board[x - 1][y - 1];
@@ -74,10 +63,9 @@ const Game = () => {
 							promote = true;
 						}
 					}
-					setShogi((prev) => {
-						const shogi = cloneShogi(prev);
+					setSfen(() => {
 						shogi.move(fromx, fromy, x, y, promote);
-						return shogi;
+						return shogi.toSFENString();
 					});
 				}
 				setSelected(initialSelectedState);
@@ -92,10 +80,9 @@ const Game = () => {
 				);
 				if (canDrop) {
 					// 空いている場合は駒を配置する
-					setShogi((prev) => {
-						const shogi = cloneShogi(prev);
+					setSfen(() => {
 						shogi.drop(x, y, selected.piece.kind, selected.piece.color);
-						return shogi;
+						return shogi.toSFENString();
 					});
 				}
 				setSelected(initialSelectedState);
@@ -143,9 +130,9 @@ const Game = () => {
 			<div>
 				<Header onCopySfenClick={onCopySfenClick} />
 			</div>
-			<div className="cite_style">
+			<div className={styles.container}>
 				{/* 先手の持ち駒 */}
-				<div className="container-bram">
+				<div className={styles["hand-summary-container"]}>
 					<HandSummary
 						summary={shogi.getHandsSummary(Color.White)}
 						color={Color.White}
@@ -158,12 +145,12 @@ const Game = () => {
 				<ShogiBoard
 					board={shogi.board}
 					selected={selected}
-					onSquareClick={sepa_turn}
+					onSquareClick={(x, y) => handleBoardClick(x, y)}
 					moves={selected.moves}
 				/>
 
 				{/* 後手の持ち駒 */}
-				<div className="container">
+				<div className={styles["hand-summary-container"]}>
 					<HandSummary
 						summary={shogi.getHandsSummary(Color.Black)}
 						color={Color.Black}

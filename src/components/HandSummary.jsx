@@ -3,7 +3,7 @@ import PieceImage from "./PieceImage";
 
 const HandSummary = ({ summary, color, selectedKind, onPieceClick }) => {
 	return (
-		<div className={styles["hand-summary-container"]}>
+		<div className={styles.container}>
 			{Object.entries(summary)
 				.filter(([_, count]) => count > 0)
 				.map(([kind, count]) => (

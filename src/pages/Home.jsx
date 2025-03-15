@@ -1,15 +1,17 @@
 import { useNavigate } from "react-router";
+import useSfen from "../hooks/useSfen";
 import styles from "./Home.module.css";
 
 const Home = () => {
+	const [sfen, setSfen, resetSfen] = useSfen();
 	const navigate = useNavigate();
 
 	const handleStartClick = () => {
-		console.log("handleStartClick");
+		resetSfen();
 		navigate("/game");
 	};
 	const handleRestoreClick = () => {
-		console.log("handleRestoreClick");
+		navigate("/game");
 	};
 
 	return (
