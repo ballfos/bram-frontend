@@ -1,3 +1,10 @@
+/* [data-theme="light"]  */
+:root {
+	--primary-color: #df6722;
+	--text-color: #000000;
+	--background-color: #abc49a;
+}
+
 #root {
 	height: 100dvh;
 	background-color: #d4e2e1;

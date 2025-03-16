@@ -6,7 +6,7 @@
 	gap: 1em;
 	align-items: center;
 	justify-content: center;
-	background-color: #abc49a;
+	background-color: var(--background-color);
 }
 
 .title {
@@ -113,7 +113,7 @@
 	left: 4px;
 	width: calc(100% / 3 - 8px);
 	height: calc(100% - 8px);
-	background-color: #df6722;
+	background-color: var(--primary-color);
 	border-radius: 8px;
 	transition: ease 0.5s;
 }

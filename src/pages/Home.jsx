@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Color } from "shogi.js";
+import ThemeToggleButton from "../components/ThemeToggleButton";
 import useSfen from "../hooks/useSfen";
 import useTurn from "../hooks/useTurn";
 import styles from "./Home.module.css";
@@ -73,6 +74,10 @@ const Home = () => {
 			>
 				前回の復元
 			</button>
+
+			<span className={styles.divider}>設定</span>
+
+			<ThemeToggleButton />
 		</div>
 	);
 };
