@@ -5,6 +5,7 @@ import HandSummary from "../components/HandSummary";
 import Header from "../components/Header";
 import ShogiBoard from "../components/ShogiBoard";
 import useSfen from "../hooks/useSfen";
+import useTurn from "../hooks/useTurn";
 import { shogiFromSfen } from "../utils";
 import styles from "./Game.module.css";
 
@@ -18,12 +19,13 @@ const initialSelectedState = {
 
 const Game = () => {
 	const [sfen, setSfen] = useSfen();
+	const [turn, setTurn] = useTurn();
 	const [selected, setSelected] = useState(initialSelectedState);
 	const [isGameOver, setIsGameOver] = useState(false);
 	const shogi = useMemo(() => shogiFromSfen(sfen), [sfen]);
 
 	useEffect(() => {
-		if (shogi.turn === Color.White) {
+		if (shogi.turn !== turn) {
 			axios
 				.post("http://127.0.0.1:8000/next", {
 					currentSfen: shogi.toSFENString(),
@@ -36,9 +38,12 @@ const Game = () => {
 					console.error("Error sending data:", error);
 				});
 		}
-	}, [shogi, setSfen]);
+	}, [shogi, setSfen, turn]);
 
 	const handleBoardClick = (x, y) => {
+		if (shogi.turn !== turn) {
+			return;
+		}
 		const piece = shogi.board[x - 1][y - 1];
 		switch (selected.type) {
 			// 現時点でボード上の駒が選択されている場合
@@ -51,7 +56,7 @@ const Game = () => {
 				);
 				if (movable) {
 					const enteredEnemyTerritory =
-						(shogi.turn === Color.White && y >= 6) ||
+						(shogi.turn === Color.White && y > 6) ||
 						(shogi.turn === Color.Black && y < 4);
 					const canPromote =
 						Piece.canPromote(shogi.board[fromx - 1][fromy - 1].kind) &&
@@ -130,7 +135,14 @@ const Game = () => {
 			<div>
 				<Header onCopySfenClick={onCopySfenClick} />
 			</div>
-			<div className={styles.container}>
+			<div
+				className={styles.container}
+				style={
+					turn === Color.Black
+						? { transform: "rotate(0deg)" }
+						: { transform: "rotate(180deg)" }
+				}
+			>
 				{/* 先手の持ち駒 */}
 				<div className={styles["hand-summary-container"]}>
 					<HandSummary
