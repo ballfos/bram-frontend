@@ -1,9 +1,10 @@
+import { useContext, useEffect } from "react";
 import { FaMoon, FaSun } from "react-icons/fa";
-import useTheme from "../hooks/useTheme";
+import { ThemeContext } from "../hooks/ThemeContext";
 import styles from "./ThemeToggleButton.module.css";
 
 const ThemeToggleButton = () => {
-	const [theme, toggleTheme] = useTheme();
+	const { theme, toggleTheme } = useContext(ThemeContext);
 
 	return (
 		<button
