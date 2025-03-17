@@ -1,6 +1,8 @@
 // App.js
 
+import { useEffect } from "react";
 import { Route, BrowserRouter as Router, Routes } from "react-router";
+
 import Game from "./pages/Game";
 import Home from "./pages/Home";
 
