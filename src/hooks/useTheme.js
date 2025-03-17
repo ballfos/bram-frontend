@@ -1,12 +1,15 @@
 import { useEffect } from "react";
 import { useLocalStorage } from "react-use";
 
-function useTheme() {
-	const [theme, setTheme] = useLocalStorage("theme", "light");
+const initialTheme = () => {
+	if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+		return "dark";
+	}
+	return "light";
+};
 
-	useEffect(() => {
-		document.documentElement.setAttribute("data-theme", theme);
-	}, [theme]);
+function useTheme() {
+	const [theme, setTheme] = useLocalStorage("theme", initialTheme);
 
 	const toggleTheme = () => {
 		setTheme(theme === "light" ? "dark" : "light");
