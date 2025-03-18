@@ -37,13 +37,13 @@
 	background-color: transparent;
 	color: white;
 	font-size: 1rem;
-	padding: 5px 10px;
-	border-radius: 5px;
+	outline: none;
 	text-align: center;
 	text-decoration: none;
 	cursor: pointer;
 	white-space: nowrap;
 	transition: background-color 0.3s ease, color 0.3s ease;
+	border-color: transparent;
 }
 
 .header-button:hover {

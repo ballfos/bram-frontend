@@ -8,7 +8,7 @@ const Header = ({ onCopySfenClick }) => {
 			<nav className="header-nav">
 				<ul className="header-list">
 					<li>
-						<a href="#home" className="header-button">
+						<a href="/" className="header-button">
 							<h3>ホーム</h3>
 						</a>
 					</li>
