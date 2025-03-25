@@ -28,8 +28,12 @@ jobs:
       # 4. アプリケーションのビルド
       - name: Build application
         run: npm run build
+        
+      # 5. index.html を 404.html にコピー
+      - name: Copy index.html to 404.html
+        run: cp dist/index.html dist/404.html
 
-      # 5. GitHub Pages にデプロイするためのアーティファクトをアップロード
+      # 6. GitHub Pages にデプロイするためのアーティファクトをアップロード
       - name: Upload build to GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
