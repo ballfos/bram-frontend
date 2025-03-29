@@ -1,6 +1,6 @@
 import { Color } from "shogi.js";
+import useTurn from "../hooks/useTurn";
 import styles from "./PieceImage.module.css";
-
 const kindToSrc = {
 	FU: "/pieces/p.png",
 	KY: "/pieces/l.png",
@@ -25,9 +25,10 @@ const PieceImage = ({
 	highlight = false,
 	...props
 }) => {
+	const [turn, setTurn] = useTurn();
 	return (
 		<div
-			className={`${styles["piece-container"]} ${highlight ? styles["piece-highlight"] : ""}`}
+			className={`${styles["piece-container"]} ${highlight && turn === color ? styles["piece-highlight"] : ""}`}
 			{...props}
 		>
 			<img
