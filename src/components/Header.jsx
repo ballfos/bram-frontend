@@ -1,25 +1,36 @@
 import React from "react";
-import "./Header.css";
 import { MdContentCopy } from "react-icons/md";
+import { MdHome } from "react-icons/md";
+import { Link } from "react-router";
+import styles from "./Header.module.css";
+import ThemeToggleButton from "./ThemeToggleButton";
 const Header = ({ onCopySfenClick }) => {
 	return (
-		<header className="header">
-			<h1 className="header-title">Bらm将棋盤</h1>
-			<nav className="header-nav">
-				<ul className="header-list">
+		<header className={styles.header}>
+			<h1 className={styles["header-title"]}>Bらm将棋盤</h1>
+			<nav className={styles["header-nav"]}>
+				<ul className={styles["header-list"]}>
 					<li>
-						<a href="/" className="header-button">
-							<h3>ホーム</h3>
-						</a>
+						<Link
+							className={styles["item-text"]}
+							to={{
+								pathname: "/",
+							}}
+						>
+							<MdHome fontSize={24} />
+						</Link>
 					</li>
 					<li>
 						<button
 							onClick={onCopySfenClick}
-							className="header-button"
+							className={styles["item-text"]}
 							type="button"
 						>
-							<MdContentCopy fontSize={24} /> <h3>SFEN</h3>
+							<MdContentCopy fontSize={24} />
 						</button>
+					</li>
+					<li>
+						<ThemeToggleButton />
 					</li>
 				</ul>
 			</nav>
