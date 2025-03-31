@@ -8,6 +8,10 @@
 	--color-background: #b6d6a0;
 	--color-on-background: #000000;
 	--color-divider: #828282;
+	--color-header: rgb(74, 74, 74);
+	--color-on-header: rgb(255, 255, 255);
+	--color-board: rgb(238, 236, 219);
+	--color-on-board: rgb(175, 144, 49);
 	--color-on-divider: #6d6d6d;
 	--color-shadow: #00000078;
 }
@@ -22,18 +26,25 @@
 	--color-background: #313131;
 	--color-on-background: #fefefe;
 	--color-divider: #b9b9b9;
+	--color-header: rgb(74, 74, 74);
+	--color-on-header: rgb(255, 255, 255);
+	--color-board: rgb(111, 109, 109);
+	--color-on-board: rgb(39, 38, 38);
 	--color-on-divider: #cbcbcb;
 	--color-shadow: #00000078;
 }
 
+:root {
+	font-family: "Noto Serif JP", serif;
+	font-size: medium;
+}
+
 #root {
-	height: 100dvh;
+	min-height: 100dvh;
 	display: flex;
 	justify-content: center;
 	background-color: var(--color-background);
 	color: var(--color-on-background);
-	padding: 0;
-	margin: 0;
 }
 
 body {

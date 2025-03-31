@@ -124,17 +124,15 @@ const Game = () => {
 		}
 	};
 
-	const onCopySfenClick = async () => {
+	const handleCopyClick = async () => {
 		try {
 			await navigator.clipboard.writeText(shogi.toSFENString());
 		} catch (err) {}
 	};
 
 	return (
-		<div className="style">
-			<div>
-				<Header onCopySfenClick={onCopySfenClick} />
-			</div>
+		<div className="container">
+			<Header onCopySfenClick={handleCopyClick} />
 			<div
 				className={styles.container}
 				style={
