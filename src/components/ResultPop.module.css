@@ -12,8 +12,8 @@
 }
 
 .modal-content {
-	width: 30vw;
-	height: 30vh;
+	width: fit-content;
+	height: fit-content;
 	background-color: var(--color-surface-dim);
 	border-radius: 10px;
 	box-shadow: 0 0 15px var(--color-on-surface-dim);

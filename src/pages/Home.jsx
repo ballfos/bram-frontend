@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Color } from "shogi.js";
 import ThemeToggleButton from "../components/ThemeToggleButton";
+import useGameStatus, { GameStatus } from "../hooks/useGameStatus";
 import useSfen from "../hooks/useSfen";
 import useTurn from "../hooks/useTurn";
 import styles from "./Home.module.css";
@@ -15,6 +16,7 @@ const options = [
 const Home = () => {
 	const [sfen, setSfen, resetSfen] = useSfen();
 	const [turn, setTurn] = useTurn();
+	const [gameStatus, setGameStatus] = useGameStatus();
 	const [selected, setSelected] = useState({
 		turn: Color.Black,
 	});
@@ -27,6 +29,7 @@ const Home = () => {
 		} else {
 			setTurn(selected.turn);
 		}
+		setGameStatus(GameStatus.PLAY);
 		navigate("/game");
 	};
 	const handleRestoreClick = () => {

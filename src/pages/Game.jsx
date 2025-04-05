@@ -5,6 +5,7 @@ import HandSummary from "../components/HandSummary";
 import Header from "../components/Header";
 import ResultPop from "../components/ResultPop";
 import ShogiBoard from "../components/ShogiBoard";
+import useGameStatus, { GameStatus } from "../hooks/useGameStatus";
 import useSfen from "../hooks/useSfen";
 import useTurn from "../hooks/useTurn";
 import { shogiFromSfen } from "../utils";
@@ -17,17 +18,12 @@ const initialSelectedState = {
 	y: null, // 1-9 | null
 	moves: [], // IMove[]
 };
-const gameStatus = {
-	PLAY: "play",
-	WIN: "win",
-	LOSE: "lose",
-};
 
 const Game = () => {
 	const [sfen, setSfen] = useSfen();
 	const [turn, setTurn] = useTurn();
 	const [selected, setSelected] = useState(initialSelectedState);
-	const [gameState, setGameState] = useState(gameStatus.PLAY);
+	const [gameStatus, setGameStatus] = useGameStatus(GameStatus.PLAY);
 	const shogi = useMemo(() => shogiFromSfen(sfen), [sfen]);
 	const [showModal, setShowModal] = useState(false);
 
@@ -40,23 +36,23 @@ const Game = () => {
 				.then((response) => {
 					const nextSfen = response.data.message;
 					const status = response.data.status;
-					setGameState(status);
+					setGameStatus(status);
 					setSfen(nextSfen);
 				})
 				.catch((error) => {
 					console.error("Error sending data:", error);
 				});
 		}
-	}, [shogi, setSfen, turn]);
+	}, [shogi, setSfen, turn, setGameStatus]);
 
 	useEffect(() => {
-		if (gameState !== gameStatus.PLAY) {
+		if (gameStatus !== GameStatus.PLAY) {
 			setShowModal(true);
 		}
-	}, [gameState]);
+	}, [gameStatus]);
 
 	const handleBoardClick = (x, y) => {
-		if (gameState !== gameStatus.PLAY) {
+		if (gameStatus !== GameStatus.PLAY) {
 			return;
 		}
 		if (shogi.turn !== turn) {
@@ -154,7 +150,7 @@ const Game = () => {
 			<ResultPop
 				showFlag={showModal}
 				setShowFlag={setShowModal}
-				result={gameState}
+				result={gameStatus}
 			/>
 			<div
 				className={styles.container}
