@@ -11,7 +11,7 @@
 	z-index: 1000; /* 前面に表示 */
 }
 
-.modalContent {
+.modal-content {
 	width: 30vw;
 	height: 30vh;
 	background-color: var(--color-surface-dim);
@@ -24,7 +24,7 @@
 	justify-content: center;
 }
 
-.buttonContainer {
+.button-container {
 	display: flex;
 	gap: 20px;
 	margin-top: 20px;

@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Color, Piece, Shogi } from "shogi.js";
 import HandSummary from "../components/HandSummary";
 import Header from "../components/Header";
-import Modal from "../components/ResultPop";
+import ResultPop from "../components/ResultPop";
 import ShogiBoard from "../components/ShogiBoard";
 import useSfen from "../hooks/useSfen";
 import useTurn from "../hooks/useTurn";
@@ -27,7 +27,7 @@ const Game = () => {
 	const [sfen, setSfen] = useSfen();
 	const [turn, setTurn] = useTurn();
 	const [selected, setSelected] = useState(initialSelectedState);
-	const [gameState, setgameState] = useState(gameStatus.PLAY);
+	const [gameState, setGameState] = useState(gameStatus.PLAY);
 	const shogi = useMemo(() => shogiFromSfen(sfen), [sfen]);
 	const [showModal, setShowModal] = useState(false);
 
@@ -40,7 +40,7 @@ const Game = () => {
 				.then((response) => {
 					const nextSfen = response.data.message;
 					const status = response.data.status;
-					setgameState(status);
+					setGameState(status);
 					setSfen(nextSfen);
 				})
 				.catch((error) => {
@@ -151,7 +151,7 @@ const Game = () => {
 	return (
 		<div className="container">
 			<Header onCopySfenClick={handleCopyClick} />
-			<Modal
+			<ResultPop
 				showFlag={showModal}
 				setShowFlag={setShowModal}
 				result={gameState}

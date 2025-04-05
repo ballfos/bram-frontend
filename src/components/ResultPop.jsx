@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router";
 import styles from "./ResultPop.module.css";
-const Modal = ({ showFlag, setShowFlag, result }) => {
+const ResultPop = ({ showFlag, setShowFlag, result }) => {
 	const navigate = useNavigate();
 	if (!showFlag) return null;
 
@@ -13,9 +13,9 @@ const Modal = ({ showFlag, setShowFlag, result }) => {
 	};
 	return (
 		<div className={styles.overlay}>
-			<div className={styles.modalContent}>
+			<div className={styles["modal-content"]}>
 				<h1>{result === "win" ? "勝利" : "敗北"}</h1>
-				<div className={styles.buttonContainer}>
+				<div className={styles["button-container"]}>
 					<button
 						type="button"
 						className={styles.button}
@@ -43,4 +43,4 @@ const Modal = ({ showFlag, setShowFlag, result }) => {
 	);
 };
 
-export default Modal;
+export default ResultPop;
