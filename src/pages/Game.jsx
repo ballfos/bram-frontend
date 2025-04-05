@@ -3,7 +3,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Color, Piece, Shogi } from "shogi.js";
 import HandSummary from "../components/HandSummary";
 import Header from "../components/Header";
+import ResultPop from "../components/ResultPop";
 import ShogiBoard from "../components/ShogiBoard";
+import useGameStatus, { GameStatus } from "../hooks/useGameStatus";
 import useSfen from "../hooks/useSfen";
 import useTurn from "../hooks/useTurn";
 import { shogiFromSfen } from "../utils";
@@ -21,8 +23,9 @@ const Game = () => {
 	const [sfen, setSfen] = useSfen();
 	const [turn, setTurn] = useTurn();
 	const [selected, setSelected] = useState(initialSelectedState);
-	const [isGameOver, setIsGameOver] = useState(false);
+	const [gameStatus, setGameStatus] = useGameStatus(GameStatus.PLAY);
 	const shogi = useMemo(() => shogiFromSfen(sfen), [sfen]);
+	const [showModal, setShowModal] = useState(false);
 
 	useEffect(() => {
 		if (shogi.turn !== turn) {
@@ -32,15 +35,26 @@ const Game = () => {
 				})
 				.then((response) => {
 					const nextSfen = response.data.message;
+					const status = response.data.status;
+					setGameStatus(status);
 					setSfen(nextSfen);
 				})
 				.catch((error) => {
 					console.error("Error sending data:", error);
 				});
 		}
-	}, [shogi, setSfen, turn]);
+	}, [shogi, setSfen, turn, setGameStatus]);
+
+	useEffect(() => {
+		if (gameStatus !== GameStatus.PLAY) {
+			setShowModal(true);
+		}
+	}, [gameStatus]);
 
 	const handleBoardClick = (x, y) => {
+		if (gameStatus !== GameStatus.PLAY) {
+			return;
+		}
 		if (shogi.turn !== turn) {
 			return;
 		}
@@ -133,6 +147,11 @@ const Game = () => {
 	return (
 		<div className="container">
 			<Header onCopySfenClick={handleCopyClick} />
+			<ResultPop
+				showFlag={showModal}
+				setShowFlag={setShowModal}
+				result={gameStatus}
+			/>
 			<div
 				className={styles.container}
 				style={
